@@ -19,6 +19,9 @@ class Docketter(object):
         now = datetime.now()
         print("[{}] {}".format(now, message))
 
+    def _exec_command(self, instructions):
+        subprocess.run(instructions)
+
     def _get_configurations_path(self):
         home = os.getenv('HOME')
         config_path = os.path.join(home, self.BASE_PATH)
@@ -103,7 +106,7 @@ class Docketter(object):
             '-d'
         ]
 
-        subprocess.run(instructions)
+        self._exec_command(instructions)
 
     def stop_docker(self, label):
         reference = self._get_reference(label)
@@ -117,6 +120,4 @@ class Docketter(object):
             'stop'
         ]
 
-        subprocess.run(instructions)
-
-
+        self._exec_command(instructions)
