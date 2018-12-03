@@ -7,11 +7,15 @@ from docketter import Docketter
 
 
 class MockFileOpen(object):
-    def __init__(self, value):
+    def __init__(self, value, write=lambda *args, **kwargs: None):
         self.value = value
+        self.write_callback = write
 
     def read(self):
         return json.dumps(self.value)
+
+    def write(self, *args, **kwargs):
+        self.write_callback(args, kwargs)
 
     def __enter__(self, *args, **kwargs):
         return self
@@ -108,7 +112,23 @@ class TestDocketter(TestCase):
         patch_open_file.stop()
 
     def test__save_configurations(self):
-        pass
+        config = {}
+        write_counter = list()
+
+        patch_open_file = patch('docketter.open')
+        mock = patch_open_file.start()
+        mock.side_effect = lambda *args, **kwargs: MockFileOpen(
+            config,
+            lambda *args, **kwargs: write_counter.append(args)
+        )
+
+        self.mock_path_exists.return_value = True
+
+        self.assertEqual(len(write_counter), 0)
+        self.docketter._save_configurations()
+        self.assertTrue(len(write_counter) > 0)
+
+        patch_open_file.stop()
 
     def test__check_healthy(self):
         self.docketter.configurations = dict()
