@@ -1,8 +1,23 @@
+import json
 import os
 from unittest import TestCase
 from unittest.mock import patch
 
 from docketter import Docketter
+
+
+class MockFileOpen(object):
+    def __init__(self, value):
+        self.value = value
+
+    def read(self):
+        return json.dumps(self.value)
+
+    def __enter__(self, *args, **kwargs):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        return True
 
 
 class TestDocketter(TestCase):
@@ -13,8 +28,8 @@ class TestDocketter(TestCase):
         mock_get_env.return_value = self.home_path
 
         self.patch_os_path_exists = patch('docketter.os.path.exists')
-        mock_path_exists = self.patch_os_path_exists.start()
-        mock_path_exists.return_value = False
+        self.mock_path_exists = self.patch_os_path_exists.start()
+        self.mock_path_exists.return_value = False
 
         self.patch_os_make_dirs = patch('docketter.os.makedirs')
         mock_make_dirs = self.patch_os_make_dirs.start()
@@ -76,7 +91,21 @@ class TestDocketter(TestCase):
         self.assertEqual(expected_path, obtained_path)
 
     def test__set_configurations(self):
-        pass
+        config = {
+            'test': 'config'
+        }
+
+        patch_open_file = patch('docketter.open')
+        mock = patch_open_file.start()
+        mock.side_effect = lambda *args, **kwargs: MockFileOpen(config)
+
+        self.mock_path_exists.return_value = True
+
+        self.docketter._set_configurations()
+
+        self.assertDictEqual(config, self.docketter.configurations)
+
+        patch_open_file.stop()
 
     def test__save_configurations(self):
         pass
