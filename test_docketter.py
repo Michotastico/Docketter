@@ -1,3 +1,4 @@
+import os
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -6,9 +7,10 @@ from docketter import Docketter
 
 class TestDocketter(TestCase):
     def setUp(self):
+        self.home_path = 'home_path'
         self.patch_os_get_env = patch('docketter.os.getenv')
         mock_get_env = self.patch_os_get_env.start()
-        mock_get_env.return_value = 'home_path'
+        mock_get_env.return_value = self.home_path
 
         self.patch_os_path_exists = patch('docketter.os.path.exists')
         mock_path_exists = self.patch_os_path_exists.start()
@@ -67,7 +69,11 @@ class TestDocketter(TestCase):
         self.assertEqual(len(instruction_to_be_executed), len(instructions))
 
     def test__get_configurations_path(self):
-        pass
+        expected_path = os.path.join(
+            self.home_path, self.docketter.BASE_PATH, self.docketter.CONFIG_FILE
+        )
+        obtained_path = self.docketter._get_configurations_path()
+        self.assertEqual(expected_path, obtained_path)
 
     def test__set_configurations(self):
         pass
@@ -76,25 +82,109 @@ class TestDocketter(TestCase):
         pass
 
     def test__check_healthy(self):
-        pass
+        self.docketter.configurations = dict()
+        self.docketter._check_healthy()
+        self.assertIn('dockers', self.docketter.configurations)
+        self.assertIn('alias', self.docketter.configurations)
 
     def test_add_docker(self):
-        pass
+        self.docketter._save_configurations = lambda: None
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        self.docketter.add_docker(name, path, alias)
+
+        self.assertIn(name, self.docketter.configurations['dockers'])
+        self.assertEqual(self.docketter.configurations['dockers'][name], path)
+        self.assertIn(alias, self.docketter.configurations['alias'])
+        self.assertEqual(self.docketter.configurations['alias'][alias], name)
 
     def test_add_alias(self):
-        pass
+        self.docketter._save_configurations = lambda: None
+        name = 'name'
+        alias = 'alias'
+
+        self.docketter.add_alias(name, alias)
+
+        self.assertIn(alias, self.docketter.configurations['alias'])
+        self.assertEqual(self.docketter.configurations['alias'][alias], name)
 
     def test_get_docker_name(self):
-        pass
+        name = 'DOCKER_NAME'
+        reference = self.docketter.get_docker_name(name)
+
+        self.assertEqual(name, reference)
 
     def test_remove_alias(self):
-        pass
+        self.docketter._save_configurations = lambda: None
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        self.docketter.add_docker(name, path, alias)
+
+        # Remove name, not alias
+        success = self.docketter.remove_alias(name)
+
+        self.assertFalse(success)
+        self.assertIn(alias, self.docketter.configurations['alias'])
+        self.assertEqual(self.docketter.configurations['alias'][alias], name)
+
+        # Remove the alias
+        success = self.docketter.remove_alias(alias)
+
+        self.assertTrue(success)
+        self.assertNotIn(alias, self.docketter.configurations['alias'])
 
     def test_remove_docker(self):
-        pass
+        self.docketter._save_configurations = lambda: None
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        self.docketter.add_docker(name, path, alias)
+
+        # The docker can be removed by alias
+        self.docketter.remove_docker(alias)
+
+        self.assertNotIn(alias, self.docketter.configurations['alias'])
+        self.assertNotIn(name, self.docketter.configurations['dockers'])
+
+        self.docketter.add_docker(name, path, alias)
+
+        # And can be removed using his name. But this not remove the alias
+        self.docketter.remove_docker(name)
+
+        self.assertNotIn(name, self.docketter.configurations['dockers'])
 
     def test__get_reference(self):
-        pass
+        self.docketter._save_configurations = lambda: None
+        self.docketter._log = lambda value: None
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        self.docketter.add_docker(name, path, alias)
+
+        # The reference can be used with the name or the alias
+
+        reference_name = self.docketter._get_reference(name)
+        reference_alias = self.docketter._get_reference(alias)
+
+        self.assertEqual(path, reference_name)
+        self.assertEqual(path, reference_alias)
+        self.assertEqual(reference_name, reference_alias)
+
+        # If the docker is removed by name and try to get the reference using
+        # his alias, the alias is removed
+
+        self.docketter.remove_docker(name)
+        self.assertIn(alias, self.docketter.configurations['alias'])
+
+        reference = self.docketter._get_reference(alias)
+        self.assertIsNone(reference)
+        self.assertNotIn(alias, self.docketter.configurations['alias'])
 
     def test_run_docker(self):
         pass
