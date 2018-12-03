@@ -187,7 +187,74 @@ class TestDocketter(TestCase):
         self.assertNotIn(alias, self.docketter.configurations['alias'])
 
     def test_run_docker(self):
-        pass
+        log_counter = list()
+        exec_command_counter = list()
+
+        self.docketter._save_configurations = lambda: None
+        self.docketter._log = lambda value: log_counter.append(value)
+        self.docketter._exec_command = (
+            lambda value: exec_command_counter.append(value)
+        )
+
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        # Missing docker, log the case
+        self.docketter.run_docker(alias)
+
+        expected_log = 'Missing label {}'.format(alias)
+        self.assertEqual(len(log_counter), 1)
+        self.assertEqual(log_counter[0], expected_log)
+
+        self.docketter.add_docker(name, path, alias)
+
+        # Existent docker
+        self.docketter.run_docker(alias)
+        self.assertEqual(len(exec_command_counter), 1)
+
+        expected_instruction = [
+            'docker-compose',
+            '-f',
+            path,
+            'up',
+            '-d'
+        ]
+
+        self.assertListEqual(expected_instruction, exec_command_counter[0])
 
     def test_stop_docker(self):
-        pass
+        log_counter = list()
+        exec_command_counter = list()
+
+        self.docketter._save_configurations = lambda: None
+        self.docketter._log = lambda value: log_counter.append(value)
+        self.docketter._exec_command = (
+            lambda value: exec_command_counter.append(value)
+        )
+
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        # Missing docker, log the case
+        self.docketter.stop_docker(alias)
+
+        expected_log = 'Missing label {}'.format(alias)
+        self.assertEqual(len(log_counter), 1)
+        self.assertEqual(log_counter[0], expected_log)
+
+        self.docketter.add_docker(name, path, alias)
+
+        # Existent docker
+        self.docketter.stop_docker(alias)
+        self.assertEqual(len(exec_command_counter), 1)
+
+        expected_instruction = [
+            'docker-compose',
+            '-f',
+            path,
+            'stop'
+        ]
+
+        self.assertListEqual(expected_instruction, exec_command_counter[0])
