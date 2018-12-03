@@ -1,5 +1,11 @@
 import sys
 
+from docketter import Docketter
+
+
+class CLIException(Exception):
+    pass
+
 
 def help_message():
     message = """
@@ -25,15 +31,26 @@ def help_message():
     print(message)
 
 
-def error_message():
-    message = "[ERROR] Please use `help` to check the use of Docketter"
-    print(message)
+def raise_error(message=None):
+    base_error = "[ERROR] Please use `help` to check the use of Docketter"
+    if message is not None:
+        base_error += '\n{}'.format(message)
+
+    raise CLIException(base_error)
+
+
+def check_arguments_size(arguments, length):
+    received_arguments_length = len(arguments)
+    if received_arguments_length < length:
+        raise_error(
+            "Expected {} arguments, received {}".format(
+                length, received_arguments_length
+            )
+        )
 
 
 def run(arguments):
-    if len(arguments) < 1:
-        error_message()
-        return
+    check_arguments_size(arguments, 1)
 
     action = arguments[0].lower()
 
@@ -43,13 +60,49 @@ def run(arguments):
     ]
 
     if action not in commands:
-        error_message()
-        return
+        raise_error()
 
-    if action in ['help']:
+    docketter = Docketter()
+
+    if action in ['run']:
+        check_arguments_size(arguments, 2)
+        subject = arguments[1]
+        docketter.run_docker(subject)
+
+    elif action in ['stop']:
+        check_arguments_size(arguments, 2)
+        subject = arguments[1]
+        docketter.stop_docker(subject)
+
+    elif action in ['add-docker']:
+        check_arguments_size(arguments, 2)
+        subject_name = arguments[1]
+        subject_path = arguments[2]
+        subject_alias = arguments[3] if len(arguments) > 2 else None
+        docketter.add_docker(subject_name, subject_path, subject_alias)
+
+    elif action in ['add-alias']:
+        check_arguments_size(arguments, 2)
+        subject_name = arguments[1]
+        subject_alias = arguments[2]
+        docketter.add_alias(subject_name, subject_alias)
+
+    elif action in ['remove-docker']:
+        check_arguments_size(arguments, 1)
+        subject = arguments[1]
+        docketter.remove_docker(subject)
+
+    elif action in ['remove-alias']:
+        check_arguments_size(arguments, 1)
+        subject = arguments[1]
+        docketter.remove_alias(subject)
+
+    elif action in ['help']:
         help_message()
-        return
 
 
 if __name__ == "__main__":
-    run(sys.argv[1:])
+    try:
+        run(sys.argv[1:])
+    except CLIException as error:
+        print(error)
