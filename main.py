@@ -1,8 +1,8 @@
 import sys
 
 
-def help_command():
-    text = """
+def help_message():
+    message = """
     NAME
         docketter - manage multiple docker-compose file.
         
@@ -22,17 +22,32 @@ def help_command():
         help - Display this information.
         
         """
-    print(text)
+    print(message)
+
+
+def error_message():
+    message = "[ERROR] Please use `help` to check the use of Docketter"
+    print(message)
 
 
 def run(arguments):
     if len(arguments) < 1:
-        help_command()
+        error_message()
         return
-    action = arguments[0]
 
-    if action in ['help', 'HELP']:
-        help_command()
+    action = arguments[0].lower()
+
+    commands = [
+        'run', 'stop', 'add-docker', 'add-alias',
+        'remove-docker', 'remove-alias', 'help'
+    ]
+
+    if action not in commands:
+        error_message()
+        return
+
+    if action in ['help']:
+        help_message()
         return
 
 
