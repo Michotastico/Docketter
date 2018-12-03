@@ -53,7 +53,18 @@ class TestDocketter(TestCase):
         self.assertEqual(expected_value, executed_value)
 
     def test__exec_command(self):
-        pass
+        instruction_to_be_executed = list()
+
+        patch_subprocess_run = patch('docketter.subprocess.run')
+        mock_run = patch_subprocess_run.start()
+        mock_run.side_effect = (
+            lambda value: instruction_to_be_executed.extend(value)
+        )
+
+        instructions = ['test', 'instruction']
+        self.docketter._exec_command(instructions)
+
+        self.assertEqual(len(instruction_to_be_executed), len(instructions))
 
     def test__get_configurations_path(self):
         pass
