@@ -25,10 +25,41 @@ def help_message():
         remove-docker - Remove a stored docker-compose using his name/alias. The SUBJECT is the name/alias.
         remove-alias - Remove an alias of a docker-compose. The SUBJECT is the alias.
         
+        info-dockers - Display the information of the stored dockers.
+        info-aliases - Display the information of the stored aliases.
+        
         help - Display this information.
         
         """
     print(message)
+
+
+def display_information(title, information):
+    message = """
+    {}
+        {}
+    """
+
+    strings_to_be_joined = list()
+    for info in information:
+        name = info.get('name')
+        alias = info.get('alias')
+        docker = info.get('docker')
+
+        if (name is None and alias is None) or docker is None:
+            continue
+
+        tag = name if name is not None else alias
+
+        strings_to_be_joined.append(
+            '{} - {}'.format(tag, docker)
+        )
+
+    parsed_string = '\n        '.join(strings_to_be_joined)
+
+    print(
+        message.format(title, parsed_string)
+    )
 
 
 def raise_error(message=None):
@@ -56,7 +87,8 @@ def run(arguments):
 
     commands = [
         'run', 'stop', 'add-docker', 'add-alias',
-        'remove-docker', 'remove-alias', 'help'
+        'remove-docker', 'remove-alias', 'help',
+        'info-dockers', 'info-aliases'
     ]
 
     if action not in commands:
@@ -96,6 +128,16 @@ def run(arguments):
         check_arguments_size(arguments, 1)
         subject = arguments[1]
         docketter.remove_alias(subject)
+
+    elif action in ['info-dockers']:
+        check_arguments_size(arguments, 0)
+        information = docketter.get_dockers()
+        display_information('Dockers', information)
+
+    elif action in ['info-aliases']:
+        check_arguments_size(arguments, 0)
+        information = docketter.get_aliases()
+        display_information('Aliases', information)
 
     elif action in ['help']:
         help_message()
