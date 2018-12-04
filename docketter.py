@@ -121,3 +121,32 @@ class Docketter(object):
         ]
 
         self._exec_command(instructions)
+
+    def get_dockers(self):
+        self._check_healthy()
+        dockers = list()
+
+        for name, path in self.configurations['dockers'].items():
+            dockers.append(
+                {
+                    'name': name,
+                    'docker': path
+                }
+            )
+
+        return dockers
+
+    def get_aliases(self):
+        self._check_healthy()
+        aliases = list()
+
+        for alias in self.configurations['alias'].keys():
+            reference = self._get_reference(alias)
+            if reference is not None:
+                aliases.append(
+                    {
+                        'alias': alias,
+                        'docker': reference
+                    }
+                )
+        return aliases

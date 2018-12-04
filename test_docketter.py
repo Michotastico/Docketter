@@ -307,3 +307,45 @@ class TestDocketter(TestCase):
         ]
 
         self.assertListEqual(expected_instruction, exec_command_counter[0])
+
+    def test_get_dockers(self):
+        self.docketter._save_configurations = lambda: None
+        dockers = self.docketter.get_dockers()
+        self.assertEqual(len(dockers), 0)
+
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        self.docketter.add_docker(name, path, alias)
+
+        dockers = self.docketter.get_dockers()
+        self.assertEqual(len(dockers), 1)
+
+        expected_docker = {
+            'name': name,
+            'docker': path
+        }
+
+        self.assertDictEqual(dockers[0], expected_docker)
+
+    def test_get_aliases(self):
+        self.docketter._save_configurations = lambda: None
+        aliases = self.docketter.get_aliases()
+        self.assertEqual(len(aliases), 0)
+
+        name = 'name'
+        alias = 'alias'
+        path = 'path'
+
+        self.docketter.add_docker(name, path, alias)
+
+        aliases = self.docketter.get_aliases()
+        self.assertEqual(len(aliases), 1)
+
+        expected_alias = {
+            'alias': alias,
+            'docker': path
+        }
+
+        self.assertDictEqual(aliases[0], expected_alias)
