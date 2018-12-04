@@ -22,6 +22,22 @@ alias docketter='python3 ~/Git/Docketter/main.py'
 
 Then you can refresh your shell and using it with the command `docketter`
 
+### Running
+
+Trying to make it the most user friendly possible, all the commands follows this structure: `docketter COMMAND SUBJECT`, where the subject can be one or more depending the command.
+
+Try it with 
+
+```
+docketter help
+```
+
+The available commands are:
+* `run`/`stop`
+* `add-docker`/`add-alias`
+* `remove-docker`/`remove-alias`
+* `info-dockers`/`info-aliases`
+* `help`
 
 ## Built With
 
