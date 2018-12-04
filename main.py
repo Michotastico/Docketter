@@ -16,19 +16,34 @@ def help_message():
         docketter COMMAND SUBJECT
         
     COMMANDS
-        run - Start the docker compose name/alias defined as SUBJECT
-        stop - Stop the docker compose name/alias defined as SUBJECT.
+        run 
+            - Start the docker compose name/alias defined as SUBJECT
+        stop 
+            - Stop the docker compose name/alias defined as SUBJECT.
         
-        add-docker - Add a new docker-compose file. The SUBJECT are two required string and one optional in the following order: NAME PATH ALIAS.
-        add-alias - Add a new alias for a stored docker-compose using his name/alias. The SUBJECT are t wo required string in the following order: NAME ALIAS
+        add-docker 
+            - Add a new docker-compose file. 
+              The SUBJECT are two required string and one optional:
+                - NAME PATH ALIAS.
+        add-alias 
+            - Add a new alias for a stored docker-compose using his tag.
+              The SUBJECT are two required string: 
+                - NAME ALIAS
         
-        remove-docker - Remove a stored docker-compose using his name/alias. The SUBJECT is the name/alias.
-        remove-alias - Remove an alias of a docker-compose. The SUBJECT is the alias.
+        remove-docker 
+            - Remove a stored docker-compose using his name/alias. 
+              The SUBJECT is the name/alias.
+        remove-alias 
+            - Remove an alias of a docker-compose. 
+            The SUBJECT is the alias.
         
-        info-dockers - Display the information of the stored dockers.
-        info-aliases - Display the information of the stored aliases.
+        info-dockers 
+            - Display the information of the stored dockers.
+        info-aliases 
+            - Display the information of the stored aliases.
         
-        help - Display this information.
+        help 
+            - Display this information.
         
         """
     print(message)
@@ -52,7 +67,7 @@ def display_information(title, information):
         tag = name if name is not None else alias
 
         strings_to_be_joined.append(
-            '{} - {}'.format(tag, docker)
+            '-> {} \n                - {}'.format(tag, docker)
         )
 
     parsed_string = '\n        '.join(strings_to_be_joined)
