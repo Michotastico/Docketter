@@ -4,7 +4,7 @@ A CLI for managing docker-compose files
 
 ## What it does
 
-In the developing context, one can use one or more docker-compose files (even with different names) and sometimes is complex to start/stop the dockers not knowning directly the paths of the files.
+In the developing context, one can use one or more docker-compose files (even with different names) and sometimes is complex to start/stop the dockers not knowing directly the paths of the files.
 
 Docketter store in a config file (`~/.config/docketter/`) all your dockers with a easy to remember name or alias, making the process of manage docker-compose files more human acceptable.
 
@@ -15,7 +15,7 @@ If you want to run the tests, you need at least Python 3.6, because `mock` was i
 
 ### Installing
 
-The installing only contemplate cloning this repository and add an alias in your `.bashrc` or `.zshrc` just like in the next example.
+The installing only needs cloning this repository and add an alias in your `.bashrc` or `.zshrc` just like in the next example.
 ```
 alias docketter='python3 ~/Git/Docketter/main.py'
 ```
