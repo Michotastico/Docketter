@@ -125,7 +125,7 @@ def run(arguments):
         check_arguments_size(arguments, 2)
         subject_name = arguments[1]
         subject_path = arguments[2]
-        subject_alias = arguments[3] if len(arguments) > 2 else None
+        subject_alias = arguments[3] if len(arguments) > 3 else None
         docketter.add_docker(subject_name, subject_path, subject_alias)
 
     elif action in ['add-alias']:
