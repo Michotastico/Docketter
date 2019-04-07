@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='docketter',
-    version='1.0.0',
-    packages=[],
+    version='1.0.1',
+    packages=['docketter'],
     url='https://github.com/Michotastico/docketter',
     license='MIT',
     author='Michel Llorens',
