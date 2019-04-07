@@ -1,6 +1,6 @@
 import json
 import os
-from unittest import TestCase
+from unittest import TestCase, main
 from unittest.mock import patch
 
 from docketter import Docketter
@@ -349,3 +349,6 @@ class TestDocketter(TestCase):
         }
 
         self.assertDictEqual(aliases[0], expected_alias)
+
+if __name__ == '__main__':
+    main()
